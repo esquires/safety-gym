@@ -164,6 +164,7 @@ class Engine(gym.Env, gym.utils.EzPickle):
         'lidar_exp_gain': 1.0, # Scaling factor for distance in exponential distance lidar
         'lidar_type': 'pseudo',  # 'pseudo', 'natural', see self.obs_lidar()
         'lidar_alias': True,  # Lidar bins alias into each other
+        'lidar_max_exp_dist': None,
 
         # Compass observation parameters
         'compass_shape': 2,  # Set to 2 or 3 for XY or XYZ unit vector compass observation.
@@ -1023,6 +1024,8 @@ class Engine(gym.Env, gym.utils.EzPickle):
             bin = int(angle / bin_size)
             bin_angle = bin_size * bin
             if self.lidar_max_dist is None:
+                if self.lidar_max_exp_dist is not None and dist > self.lidar_max_exp_dist:
+                    continue
                 sensor = np.exp(-self.lidar_exp_gain * dist)
             else:
                 sensor = max(0, self.lidar_max_dist - dist) / self.lidar_max_dist
